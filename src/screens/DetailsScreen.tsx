@@ -7,7 +7,12 @@ import {
   ScrollView,
 } from 'react-native';
 import SearchedCard from '../components/SearchedCard';
-import {primaryColor, secondaryColor} from '../constants/costants';
+import {
+  primaryColor,
+  screenHeight,
+  screenWidth,
+  secondaryColor,
+} from '../constants/costants';
 import {fetchCurrentWeather} from '../services/weatherService';
 import DayCards from '../components/DayCards';
 import WeatherChart from '../components/WeatherChart';
@@ -78,7 +83,7 @@ export default function DetailsScreen({route}: any) {
       )}
 
       {uniqueChartData.length > 0 && (
-        <View>
+        <View style={styles.days}>
           {uniqueChartData.slice(0, 5).map((item, index) => (
             <DayCards key={item.dt_txt} data={item} index={index} />
           ))}
@@ -100,10 +105,11 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: primaryColor,
-    padding: 16,
+    padding: screenWidth * 0.03,
   },
   loader: {
-    marginTop: 20,
+    marginTop: screenHeight * 0.03,
     alignSelf: 'center',
   },
+  days: {marginBottom: screenHeight * 0.05},
 });

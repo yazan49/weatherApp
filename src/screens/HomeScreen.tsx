@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, FlatList, SafeAreaView} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import {primaryColor, screenHeight, screenWidth} from '../constants/costants';
 import {useDispatch, useSelector} from 'react-redux';
 import {loadHistory} from '../redux/HistoryReducers';
@@ -9,15 +16,25 @@ import CustomButton from '../components/CustomButton';
 export default function HomeScreen({navigation}: any) {
   const dispatch: any = useDispatch();
   const [numbers, setNumbers] = useState<number>(5);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const data = useSelector(state => state.history.history);
 
   useEffect(() => {
     dispatch(loadHistory());
+    setIsLoading(false);
   }, [dispatch]);
 
   const loadMore = () => {
     setNumbers(prevNumber => prevNumber + 5);
   };
+  if (isLoading) {
+    return (
+      <View style={[styles.main, styles.loading]}>
+        <ActivityIndicator size={33} color={'blue'} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.main}>
@@ -82,5 +99,9 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     paddingVertical: screenHeight * 0.007,
+  },
+  loading: {
+    justifyContent: 'center',
+    width: '100%',
   },
 });

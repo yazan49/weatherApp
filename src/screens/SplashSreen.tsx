@@ -11,7 +11,7 @@ export default function SplashScreen({navigation}: any) {
   return (
     <View style={styles.main}>
       <LottieView
-        source={require('../assets/animation/splash.json')}
+        source={require('../assets/animation/cloud.json')}
         autoPlay
         loop={false}
         onAnimationFinish={handleAnimationFinish}
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     backgroundColor: primaryColor,
   },
   animation: {
-    width: '60%',
-    height: '60%',
+    width: '100%',
+    height: '100%',
   },
 });
