@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import Config from 'react-native-config';
-import { WeatherData, TodayWeather } from '../types/WeatherTypes';
+import {WeatherData, TodayWeather} from '../types/WeatherTypes';
 
 const API_KEY = Config.API_KEY;
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
@@ -22,7 +22,6 @@ const useFetchWeatherData = (city: string): FetchWeatherDataResult => {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
       const [todayRes, forecastRes] = await Promise.all([
         axios.get(`${BASE_URL}/weather`, {
@@ -44,7 +43,9 @@ const useFetchWeatherData = (city: string): FetchWeatherDataResult => {
       setTodayWeather(todayRes.data);
       setForecastData(forecastRes.data.list);
     } catch (err: any) {
-      setError(err.response?.status ? err.response.status.toString() : 'Unknown error');
+      setError(
+        err.response?.status ? err.response.status.toString() : 'Unknown error',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +57,7 @@ const useFetchWeatherData = (city: string): FetchWeatherDataResult => {
     }
   }, [city, fetchData]);
 
-  return { todayWeather, forecastData, isLoading, error };
+  return {todayWeather, forecastData, isLoading, error};
 };
 
 export default useFetchWeatherData;

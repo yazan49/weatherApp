@@ -36,27 +36,29 @@ export default function HomeScreen() {
             ? 'Welcome to Weather App'
             : 'Previously Searched Cities'}
         </Text>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={data.slice(0, numbers)}
-          renderItem={({item}) => (
-            <View key={item.name} style={styles.cardContainer}>
-              <HistoryCities data={item} />
-            </View>
-          )}
-          ListFooterComponent={
-            <>
-              {numbers < data.length ? (
-                <CustomButton
-                  title="Load More"
-                  onPress={loadMore}
-                  btnStyle={{backgroundColor: 'transparent', marginTop: 2}}
-                />
-              ) : null}
-            </>
-          }
-          style={styles.list}
-        />
+        {data.length > 0 && (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={data.slice(0, numbers)}
+            renderItem={({item}) => (
+              <View key={item.name} style={styles.cardContainer}>
+                <HistoryCities data={item} />
+              </View>
+            )}
+            ListFooterComponent={
+              <>
+                {numbers < data.length ? (
+                  <CustomButton
+                    title="Load More"
+                    onPress={loadMore}
+                    btnStyle={{backgroundColor: 'transparent', marginTop: 2}}
+                  />
+                ) : null}
+              </>
+            }
+            style={styles.list}
+          />
+        )}
         <CustomButton
           title="Search"
           onPress={() => navigation.navigate('Search')}
