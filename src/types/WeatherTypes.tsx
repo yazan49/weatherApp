@@ -1,7 +1,5 @@
 export interface Weather {
   description: string;
-  icon: string;
-  id: number;
   main: string;
 }
 
@@ -29,9 +27,18 @@ export interface Sys {
   type: number;
 }
 
+export interface Clouds {
+  all: number;
+}
+
+export interface Wind {
+  deg: number;
+  speed: number;
+}
+
 export interface WeatherData {
   base: string;
-  clouds: {all: number};
+  clouds: Clouds;
   cod: number;
   coord: Coord;
   dt: number;
@@ -42,5 +49,17 @@ export interface WeatherData {
   timezone: number;
   visibility: number;
   weather: Weather[];
-  wind: {deg: number; speed: number};
+  wind: Wind;
 }
+
+export interface WeatherState {
+  weather: Weather | null;
+  isLoading: boolean;
+  error: number | null;
+}
+
+export interface AppState {
+  weather: WeatherState;
+}
+
+export interface TodayWeather extends WeatherData {}

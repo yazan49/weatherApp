@@ -5,12 +5,16 @@ import {screenHeight, secondaryColor} from '../constants/costants';
 import {useDispatch} from 'react-redux';
 import {removeFromHistoryAndSave} from '../redux/HistoryReducers';
 import Remove from '../assets/svg/Remove';
+import {useNavigation} from '@react-navigation/native';
 
-export default function HistoryCities({data, navigation}: any) {
-  const dispatch = useDispatch();
+export default function HistoryCities({data}: any) {
+  const navigation: any = useNavigation();
+  const dispatch: any = useDispatch();
 
   const handlePress = () => {
-    navigation.navigate('Details', {data});
+    if (data.name) {
+      navigation.navigate('Details', {city: data.name});
+    }
   };
 
   const handleRemove = () => {

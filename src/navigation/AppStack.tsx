@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import SplashScreen from '../screens/SplashSreen';
 import SearchScreen from '../screens/SearchScreen';
 import DetailsScreen from '../screens/DetailsScreen';
-import {primaryColor} from '../constants/costants';
+import {backgroundColor} from '../constants/costants';
 
 const Stack = createStackNavigator();
 
@@ -28,7 +28,10 @@ const AppStack = () => {
           headerShown: true,
           headerBackTitle: ' ',
           title: '',
-          headerStyle: {backgroundColor: primaryColor},
+          headerStyle: {
+            backgroundColor: backgroundColor,
+            shadowColor: backgroundColor,
+          },
           headerTintColor: 'white',
         }}
       />
@@ -39,7 +42,10 @@ const AppStack = () => {
           headerShown: true,
           headerBackTitle: ' ',
           title: '',
-          headerStyle: {backgroundColor: primaryColor},
+          headerStyle: {
+            backgroundColor: backgroundColor,
+            shadowColor: backgroundColor,
+          },
           headerTintColor: 'white',
         }}
       />

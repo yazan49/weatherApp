@@ -13,6 +13,7 @@ export const fetchCurrentWeather = async (city: string , type:string) => {
       appid: API_KEY,
       units: 'metric',
     },
+    
   });
   return response.data;
 };

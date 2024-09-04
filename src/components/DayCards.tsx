@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {primaryColor, secondaryColor} from '../constants/costants';
+import {screenHeight, secondaryColor} from '../constants/costants';
 
 export default function DayCards({data}: any) {
   const getDayName = (timestamp: number) => {
@@ -22,7 +22,7 @@ export default function DayCards({data}: any) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 5,
+    marginTop: screenHeight * 0.01,
     backgroundColor: secondaryColor,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -30,18 +30,20 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
+
   day: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
   text: {
-    color: secondaryColor,
+    color: 'white',
   },
   temp: {
-    backgroundColor: primaryColor,
-    padding: 5,
+    backgroundColor: 'black',
+    padding: 10,
     borderRadius: 5,
   },
 });

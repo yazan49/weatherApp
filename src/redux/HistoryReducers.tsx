@@ -1,16 +1,26 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+
+interface City {
+  name: string;
+}
+
+interface HistoryState {
+  history: City[];
+}
+
+const initialState: HistoryState = {
+  history: [],
+};
 
 export const HistorySlice = createSlice({
   name: 'history',
-  initialState: {
-    history: [],
-  },
+  initialState,
   reducers: {
-    setHistory: (state, action) => {
+    setHistory: (state, action: PayloadAction<City[]>) => {
       state.history = Array.isArray(action.payload) ? action.payload : [];
     },
-    addToHistory: (state, action) => {
+    addToHistory: (state, action: PayloadAction<City>) => {
       const newCity = action.payload;
       if (!newCity || !newCity.name) {
         return;
@@ -23,7 +33,7 @@ export const HistorySlice = createSlice({
         state.history.push(newCity);
       }
     },
-    removeFromHistory: (state, action) => {
+    removeFromHistory: (state, action: PayloadAction<City>) => {
       const city = action.payload;
       if (!city || !city.name) {
         return;
@@ -36,11 +46,11 @@ export const HistorySlice = createSlice({
 export const {addToHistory, removeFromHistory, setHistory} =
   HistorySlice.actions;
 
-export const loadHistory = () => async dispatch => {
+export const loadHistory = () => async (dispatch: any) => {
   try {
     const history = await AsyncStorage.getItem('history');
     if (history) {
-      const parsedHistory = JSON.parse(history);
+      const parsedHistory = JSON.parse(history) as City[];
       dispatch(setHistory(Array.isArray(parsedHistory) ? parsedHistory : []));
     }
   } catch (error) {
@@ -48,11 +58,11 @@ export const loadHistory = () => async dispatch => {
   }
 };
 
-export const addToHistoryAndSave = city => async dispatch => {
+export const addToHistoryAndSave = (city: City) => async (dispatch: any) => {
   dispatch(addToHistory(city));
   try {
     const history = await AsyncStorage.getItem('history');
-    const currentHistory = history ? JSON.parse(history) : [];
+    const currentHistory = history ? (JSON.parse(history) as City[]) : [];
     const cityNames = new Set(currentHistory.map(item => item.name));
     if (!cityNames.has(city.name)) {
       const updatedHistory = [...currentHistory, city];
@@ -63,22 +73,23 @@ export const addToHistoryAndSave = city => async dispatch => {
   }
 };
 
-export const removeFromHistoryAndSave = city => async dispatch => {
-  dispatch(removeFromHistory(city));
-  try {
-    const history = await AsyncStorage.getItem('history');
-    if (history) {
-      const currentHistory = JSON.parse(history);
-      const updatedHistory = currentHistory.filter(
-        item => item.name !== city.name,
-      );
-      await AsyncStorage.setItem('history', JSON.stringify(updatedHistory));
-    } else {
-      console.log('No history found in AsyncStorage');
+export const removeFromHistoryAndSave =
+  (city: City) => async (dispatch: any) => {
+    dispatch(removeFromHistory(city));
+    try {
+      const history = await AsyncStorage.getItem('history');
+      if (history) {
+        const currentHistory = JSON.parse(history) as City[];
+        const updatedHistory = currentHistory.filter(
+          item => item.name !== city.name,
+        );
+        await AsyncStorage.setItem('history', JSON.stringify(updatedHistory));
+      } else {
+        console.log('No history found in AsyncStorage');
+      }
+    } catch (error) {
+      console.error('Error removing city from storage:', error);
     }
-  } catch (error) {
-    console.error('Error removing city from storage:', error);
-  }
-};
+  };
 
 export default HistorySlice.reducer;

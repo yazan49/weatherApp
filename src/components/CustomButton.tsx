@@ -1,5 +1,11 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {secondaryColor} from '../constants/costants';
 
@@ -12,10 +18,10 @@ export default function CustomButton({
   title?: string;
   onPress?: () => void;
   loading?: boolean;
-  btnStyle?: any;
+  btnStyle?: StyleProp<ViewStyle>;
 }) {
   return (
-    <TouchableOpacity style={{...styles.button, ...btnStyle}} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, btnStyle]} onPress={onPress}>
       {loading ? (
         <ActivityIndicator size={22} />
       ) : (

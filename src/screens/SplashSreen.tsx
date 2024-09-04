@@ -1,9 +1,11 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import LottieView from 'lottie-react-native';
-import {primaryColor} from '../constants/costants';
+import {backgroundColor} from '../constants/costants';
+import {useNavigation} from '@react-navigation/native';
 
-export default function SplashScreen({navigation}: any) {
+export default function SplashScreen() {
+  const navigation: any = useNavigation();
   const handleAnimationFinish = () => {
     navigation.replace('Home');
   };
@@ -26,7 +28,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: primaryColor,
+    backgroundColor: backgroundColor,
   },
   animation: {
     width: '100%',

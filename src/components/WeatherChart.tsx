@@ -1,20 +1,26 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
-import {
-  secondaryColor,
-  screenWidth,
-  primaryColor,
-  screenHeight,
-} from '../constants/costants';
+import {screenWidth, primaryColor, screenHeight} from '../constants/costants';
 
-const formatDate = dateString => {
+interface WeatherDataItem {
+  dt_txt: string;
+  main: {
+    temp: number;
+  };
+}
+
+interface WeatherChartProps {
+  uniqueChartData: WeatherDataItem[];
+}
+
+const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  const options = {day: '2-digit', month: 'short'};
+  const options: Intl.DateTimeFormatOptions = {day: '2-digit', month: 'short'};
   return date.toLocaleDateString('en-US', options);
 };
 
-const WeatherChart = ({uniqueChartData}: any) => {
+const WeatherChart = ({uniqueChartData}: WeatherChartProps) => {
   const chartData = {
     labels: uniqueChartData.map(item => formatDate(item.dt_txt.split(' ')[0])),
     datasets: [
@@ -30,7 +36,7 @@ const WeatherChart = ({uniqueChartData}: any) => {
         width={screenWidth - 35}
         height={screenHeight / 3}
         yAxisInterval={1}
-        // bezier
+        bezier
         style={styles.chart}
         data={chartData}
         verticalLabelRotation={30}

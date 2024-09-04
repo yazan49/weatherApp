@@ -1,62 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  Alert,
-  View,
-  ActivityIndicator,
-  ScrollView,
-} from 'react-native';
+import React from 'react';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import SearchedCard from '../components/SearchedCard';
 import {
-  primaryColor,
+  backgroundColor,
   screenHeight,
   screenWidth,
-  secondaryColor,
 } from '../constants/costants';
-import {fetchCurrentWeather} from '../services/weatherService';
 import DayCards from '../components/DayCards';
 import WeatherChart from '../components/WeatherChart';
+import LoadingIndicator from '../components/LoadingIndicatior';
+import {useSelector} from 'react-redux';
+import useFetchWeatherData from '../services/useFetchWeatherData';
 
 export default function DetailsScreen({route}: any) {
-  const data = route.params;
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [weatherData, setWeatherData] = useState<any[]>([]);
-  const [todayWeather, setTodayWeather] = useState<any>();
-
-  const city = data.data.name;
-
-  const getData = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetchCurrentWeather(city, 'forecast');
-      setWeatherData(res.list);
-      setIsLoading(false);
-    } catch (error) {
-      console.log('err', error);
-      Alert.alert('Make Sure You Entered A Correct Name');
-      setIsLoading(false);
-    }
-  };
-
-  const getToday = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetchCurrentWeather(city, 'weather');
-      setTodayWeather(res);
-      setIsLoading(false);
-    } catch (error) {
-      console.log('err', error);
-      Alert.alert('Make Sure You Entered A Correct Name');
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (city) {
-      getData();
-      getToday();
-    }
-  }, [city]);
+  const weatherState = useSelector((state: any) => state.weather);
+  const {weather} = weatherState;
+  const city = weather ? weather.name : route.params.city;
+  const {todayWeather, forecastData, isLoading, error} =
+    useFetchWeatherData(city);
 
   const extractDate = (dateTime: string) => {
     return dateTime.split(' ')[0];
@@ -72,44 +33,35 @@ export default function DetailsScreen({route}: any) {
     });
   };
 
-  const uniqueChartData = getDaysWeather(weatherData);
+  const uniqueChartData = forecastData ? getDaysWeather(forecastData) : [];
 
   return (
-    <ScrollView style={styles.main}>
-      {todayWeather && <SearchedCard data={todayWeather} />}
-
-      {uniqueChartData.length > 0 && (
-        <WeatherChart uniqueChartData={uniqueChartData} />
-      )}
-
-      {uniqueChartData.length > 0 && (
-        <View style={styles.days}>
-          {uniqueChartData.slice(0, 5).map((item, index) => (
-            <DayCards key={item.dt_txt} data={item} index={index} />
-          ))}
-        </View>
-      )}
-
-      {isLoading && (
-        <ActivityIndicator
-          style={styles.loader}
-          size={30}
-          color={secondaryColor}
-        />
-      )}
-    </ScrollView>
+    <View style={styles.main}>
+      <ScrollView>
+        {todayWeather && <SearchedCard data={todayWeather} />}
+        {uniqueChartData.length > 0 && (
+          <WeatherChart uniqueChartData={uniqueChartData} />
+        )}
+        {uniqueChartData.length > 0 && (
+          <View style={styles.days}>
+            {uniqueChartData.slice(0, 5).map((item, index) => (
+              <DayCards key={item.dt_txt} data={item} index={index} />
+            ))}
+          </View>
+        )}
+        {isLoading && <LoadingIndicator />}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: primaryColor,
+    backgroundColor: backgroundColor,
     padding: screenWidth * 0.03,
   },
-  loader: {
-    marginTop: screenHeight * 0.03,
-    alignSelf: 'center',
+  days: {
+    marginBottom: screenHeight * 0.05,
   },
-  days: {marginBottom: screenHeight * 0.05},
 });

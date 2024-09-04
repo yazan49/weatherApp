@@ -1,24 +1,23 @@
 import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, View, FlatList, SafeAreaView} from 'react-native';
 import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
-import {primaryColor, screenHeight, screenWidth} from '../constants/costants';
+  backgroundColor,
+  screenHeight,
+  screenWidth,
+} from '../constants/costants';
 import {useDispatch, useSelector} from 'react-redux';
 import {loadHistory} from '../redux/HistoryReducers';
 import HistoryCities from '../components/HistoryCities';
 import CustomButton from '../components/CustomButton';
+import {useNavigation} from '@react-navigation/native';
+import LoadingIndicator from '../components/LoadingIndicatior';
 
-export default function HomeScreen({navigation}: any) {
+export default function HomeScreen() {
+  const navigation: any = useNavigation();
   const dispatch: any = useDispatch();
   const [numbers, setNumbers] = useState<number>(5);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const data = useSelector(state => state.history.history);
+  const data: any = useSelector<any>(state => state.history.history);
 
   useEffect(() => {
     dispatch(loadHistory());
@@ -28,24 +27,21 @@ export default function HomeScreen({navigation}: any) {
   const loadMore = () => {
     setNumbers(prevNumber => prevNumber + 5);
   };
-  if (isLoading) {
-    return (
-      <View style={[styles.main, styles.loading]}>
-        <ActivityIndicator size={33} color={'blue'} />
-      </View>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.container}>
-        <Text style={styles.title}>Previously Searched Cities</Text>
+        <Text style={styles.title}>
+          {data.length === 0
+            ? 'Welcome to Weather App'
+            : 'Previously Searched Cities'}
+        </Text>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={data.slice(0, numbers)}
           renderItem={({item}) => (
             <View key={item.name} style={styles.cardContainer}>
-              <HistoryCities data={item} navigation={navigation} />
+              <HistoryCities data={item} />
             </View>
           )}
           ListFooterComponent={
@@ -54,7 +50,7 @@ export default function HomeScreen({navigation}: any) {
                 <CustomButton
                   title="Load More"
                   onPress={loadMore}
-                  btnStyle={{backgroundColor: null, marginTop: 0}}
+                  btnStyle={{backgroundColor: 'transparent', marginTop: 2}}
                 />
               ) : null}
             </>
@@ -66,6 +62,7 @@ export default function HomeScreen({navigation}: any) {
           onPress={() => navigation.navigate('Search')}
         />
       </View>
+      {isLoading && <LoadingIndicator />}
     </SafeAreaView>
   );
 }
@@ -73,7 +70,7 @@ export default function HomeScreen({navigation}: any) {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: primaryColor,
+    backgroundColor: backgroundColor,
   },
   container: {
     flex: 1,
@@ -87,6 +84,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: screenHeight * 0.02,
     color: 'white',
+    marginTop: screenHeight * 0.01,
   },
   list: {
     flex: 1,

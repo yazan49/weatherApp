@@ -1,67 +1,92 @@
-import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import {primaryColor, secondaryColor} from '../constants/costants';
-import {WeatherData} from '../types/WeatherTypes';
-import {fetchCurrentWeather} from '../services/weatherService';
+import React, {useState, useEffect, useCallback} from 'react';
+import {StyleSheet, TextInput, View} from 'react-native';
+import {backgroundColor, secondaryColor} from '../constants/costants';
 import SearchedCard from '../components/SearchedCard';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {addToHistoryAndSave} from '../redux/HistoryReducers';
 import {useDebounce} from 'use-debounce';
-import {setWeather} from '../redux/WeatherReducers';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import LoadingIndicator from '../components/LoadingIndicatior';
+import CustomAlert from '../components/CustomAlert';
+import {fetchWeather} from '../redux/WeatherReducers';
 
-export default function SearchScreen({navigation}: any) {
+export default function SearchScreen() {
+  const navigation: any = useNavigation();
   const dispatch: any = useDispatch();
-  const [data, setData] = useState<WeatherData | null>(null);
   const [city, setCity] = useState<string>('');
   const [value] = useDebounce(city, 1000);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const weatherState = useSelector((state: any) => state.weather);
+  const {weather, isLoading, error} = weatherState;
+  const [alettVisible, setAlertVisible] = useState({
+    status: false,
+    message: '',
+    type: '',
+  });
 
   const handleDetails = () => {
-    navigation.navigate('Details', {data: data});
+    navigation.navigate('Details');
   };
-
-  const getData = async () => {
-    try {
-      setIsLoading(true);
-      const res = await fetchCurrentWeather(city, 'weather');
-      setData(res);
-      setIsLoading(false);
-      dispatch(addToHistoryAndSave(res));
-      //   dispatch(setWeather(res))
-    } catch (error) {
-      console.log('err', error);
-      Alert.alert('Make Sure You Entered A Correct Name');
-      setIsLoading(false);
-    }
-  };
-
-  // useEffect(() => {
-  //   AsyncStorage.clear();
-  // }, []);
 
   useEffect(() => {
     if (value) {
-      getData();
+      dispatch(fetchWeather(value));
     }
   }, [value]);
+
+  useEffect(() => {
+    if (error) {
+      if (error === 404) {
+        setAlertVisible({
+          status: true,
+          message: 'Make sure you entered a correct name',
+          type: 'error',
+        });
+      } else {
+        setAlertVisible({
+          status: true,
+          message: 'Something went wrong, please try again',
+          type: 'error',
+        });
+      }
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!error && weather && value) {
+      dispatch(addToHistoryAndSave({name: value}));
+    }
+  }, [weather, error]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setAlertVisible({
+        status: false,
+        message: '',
+        type: '',
+      });
+    }, []),
+  );
 
   return (
     <View style={styles.main}>
       <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
         style={styles.input}
         placeholder="Enter city name"
-        placeholderTextColor={secondaryColor}
+        placeholderTextColor={'black'}
         value={city}
         onChangeText={text => setCity(text)}
       />
-      {isLoading && <ActivityIndicator size={30} />}
-      {data && <SearchedCard data={data} onPress={handleDetails} />}
+      {isLoading && <LoadingIndicator />}
+      {weather && <SearchedCard data={weather} onPress={handleDetails} />}
+      <CustomAlert
+        title={alettVisible.message}
+        isVisible={alettVisible.status}
+        onHide={() => setAlertVisible({status: false, message: '', type: ''})}
+        type={alettVisible.type}
+        subType="main"
+      />
     </View>
   );
 }
@@ -69,7 +94,7 @@ export default function SearchScreen({navigation}: any) {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: primaryColor,
+    backgroundColor: backgroundColor,
     alignItems: 'center',
     padding: 16,
   },
